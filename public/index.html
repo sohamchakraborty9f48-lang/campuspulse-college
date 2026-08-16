@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -8,137 +10,130 @@
 
 <script src="https://cdn.tailwindcss.com"></script>
 
-<style>
-::-webkit-scrollbar {
-    width: 6px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #475569;
-    border-radius: 20px;
-}
-</style>
-
 </head>
+
 
 <body class="bg-slate-950 text-white h-screen overflow-hidden">
 
-<!-- =========================
-     AUTH SCREEN
-========================= -->
+
+<!-- ================= AUTH ================= -->
 
 <div id="authView"
 class="fixed inset-0 flex items-center justify-center bg-slate-950 z-50">
 
-<div class="w-full max-w-md bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl p-8">
 
-<div class="text-center mb-8">
+<div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-xl">
 
-<h1 class="text-4xl font-black text-indigo-400">
+
+<h1 class="text-4xl font-bold text-center text-indigo-400">
 CampusPulse
 </h1>
 
-<p class="text-slate-400 mt-2 text-sm">
-Your real-time campus community
+
+<p class="text-center text-slate-400 mt-2 mb-6">
+Live Campus Social Network
 </p>
 
-</div>
 
 
 <div id="authError"
-class="hidden mb-4 bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-lg text-sm text-center">
-</div>
-
-
-<div class="space-y-4">
-
-
-<div>
-<label class="text-xs uppercase text-slate-400">
-Username
-</label>
-
-<input id="username"
-class="mt-1 w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 outline-none focus:border-indigo-500"
-placeholder="Enter username">
+class="hidden bg-red-500/10 text-red-400 p-3 rounded-lg mb-4 text-sm">
 </div>
 
 
 
-<div>
-<label class="text-xs uppercase text-slate-400">
-Password
+<label class="text-xs text-slate-400">
+USERNAME
 </label>
 
-<input id="password"
+<input id="loginName"
+class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 mb-4"
+placeholder="username">
+
+
+
+<label class="text-xs text-slate-400">
+PASSWORD
+</label>
+
+<input id="loginPassword"
 type="password"
-class="mt-1 w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 outline-none focus:border-indigo-500"
-placeholder="Password">
-</div>
+class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 mb-4"
+placeholder="password (blank = guest)">
 
 
 
-<div>
-<label class="text-xs uppercase text-slate-400">
-Email
+<label class="text-xs text-slate-400">
+EMAIL (SIGNUP)
 </label>
 
-<input id="email"
+<input id="signupEmail"
 type="email"
-class="mt-1 w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 outline-none focus:border-indigo-500"
-placeholder="Email for recovery">
-</div>
+class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 mb-5"
+placeholder="email@example.com">
 
 
 
-<div class="flex gap-3 pt-3">
+<div class="flex gap-3">
+
 
 <button id="loginBtn"
-class="flex-1 bg-indigo-600 hover:bg-indigo-500 rounded-lg py-3 font-bold">
+class="flex-1 bg-indigo-600 hover:bg-indigo-500 rounded-lg py-3">
 Login
 </button>
 
 
 <button id="signupBtn"
-class="flex-1 bg-emerald-600 hover:bg-emerald-500 rounded-lg py-3 font-bold">
+class="flex-1 bg-emerald-600 hover:bg-emerald-500 rounded-lg py-3">
 Signup
 </button>
+
 
 </div>
 
 
 
+
 <button id="guestBtn"
-class="w-full mt-3 bg-slate-800 hover:bg-slate-700 rounded-lg py-3 text-sm">
+class="w-full mt-3 bg-slate-800 hover:bg-slate-700 rounded-lg py-3">
 Continue as Guest
 </button>
 
 
+
+
 <button id="forgotBtn"
-class="w-full text-indigo-400 text-sm mt-4 hover:underline">
+class="block mx-auto mt-5 text-indigo-400 text-sm">
 Forgot Password?
 </button>
 
 
 
+
+
 <div id="forgotBox"
-class="hidden mt-4 border-t border-slate-700 pt-4 space-y-3">
+class="hidden mt-5 border-t border-slate-800 pt-5">
 
 
 <input id="forgotEmail"
 type="email"
-class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2"
-placeholder="Registered email">
+class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3"
+placeholder="registered email">
 
 
-<button id="resetBtn"
-class="w-full bg-slate-700 hover:bg-slate-600 rounded-lg py-2">
-Send Reset Mail
+<button id="sendResetBtn"
+class="w-full mt-3 bg-slate-700 rounded-lg py-3">
+Send Recovery Mail
 </button>
 
 
-<p id="resetStatus"
-class="text-xs text-center text-slate-400"></p>
+<p id="forgotStatus"
+class="text-xs text-center text-slate-400 mt-2">
+</p>
+
+
+</div>
+
 
 
 </div>
@@ -146,94 +141,78 @@ class="text-xs text-center text-slate-400"></p>
 
 </div>
 
-</div>
-
-</div>
 
 
 
 
-<!-- =========================
-     MAIN APP
-========================= -->
+<!-- ================= APP ================= -->
 
 
 <div id="appView"
 class="hidden h-screen flex">
 
 
+
 <!-- SIDEBAR -->
 
-<aside
-class="hidden md:flex w-72 bg-slate-900 border-r border-slate-800 flex-col">
+
+<aside class="w-72 bg-slate-900 border-r border-slate-800 p-5 flex flex-col">
 
 
-<div class="p-5 border-b border-slate-800">
-
-<h2 class="text-xl font-bold text-indigo-400">
+<h2 class="text-2xl font-bold text-indigo-400">
 CampusPulse
 </h2>
 
 
-<div id="myName"
-class="mt-3 text-xs bg-indigo-500/20 text-indigo-300 px-3 py-2 rounded-full">
+
+<div class="mt-3 text-sm bg-slate-800 rounded-lg p-3">
+
+<span id="myName">
+</span>
+
 </div>
 
 
-</div>
 
 
 
-<div class="flex-1 overflow-y-auto p-4">
-
-
-<h3 class="text-xs uppercase text-slate-500 mb-3">
-Online Students
+<h3 class="mt-8 text-xs uppercase text-slate-400">
+Online Users
 </h3>
 
 
 <ul id="usersList"
-class="space-y-2">
+class="mt-3 space-y-2">
 </ul>
 
 
 
-<div class="mt-8 bg-slate-950 border border-slate-800 rounded-xl p-4">
+
+<div class="mt-8 bg-slate-950 rounded-xl p-4">
 
 
-<h3 class="text-sm font-bold text-indigo-300 mb-3">
-Campus Poll
+<h3 id="pollQuestion"
+class="text-sm font-bold text-indigo-300">
+Poll
 </h3>
 
 
-<div id="pollQuestion"
-class="text-xs text-slate-300 mb-3">
-Loading...
-</div>
-
-
 <div id="pollOptions"
-class="space-y-2">
+class="mt-3 space-y-2">
 </div>
 
 
 </div>
 
 
-</div>
 
-
-
-<div class="p-4 border-t border-slate-800">
 
 
 <button id="logoutBtn"
-class="w-full bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white py-3 rounded-lg font-bold">
+class="mt-auto bg-red-600 hover:bg-red-500 rounded-lg py-3">
 Logout
 </button>
 
-
-</div>
 
 
 </aside>
@@ -242,24 +221,26 @@ Logout
 
 
 
-<!-- MOBILE/TOP + CHAT AREA -->
+<!-- CHAT -->
 
-<main
-class="flex-1 flex flex-col bg-slate-950">
+
+<main class="flex-1 flex flex-col">
+
 
 
 <header
-class="h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-5">
+class="bg-slate-900 border-b border-slate-800 p-5 flex justify-between">
 
 
 <div>
 
-<h1 class="font-bold text-lg">
+<h1 class="font-bold text-xl">
 Live Campus Stream
 </h1>
 
-<p class="text-xs text-slate-500">
-Public chat
+
+<p class="text-xs text-slate-400">
+Public chat & anonymous whispers
 </p>
 
 </div>
@@ -267,40 +248,21 @@ Public chat
 
 
 <button id="mobileWhisperBtn"
-class="md:hidden bg-purple-600 px-3 py-2 rounded-lg text-sm">
+class="bg-purple-700 px-4 py-2 rounded-lg">
+
 🤫 Whisper
+
 </button>
 
 
 </header>
-<!-- =========================
-     CHAT AREA
-========================= -->
 
 
-<section
-id="chatBox"
-class="flex-1 flex flex-col">
 
 
-<!-- Messages -->
 
 <div id="messages"
-class="flex-1 overflow-y-auto p-5 space-y-4">
-
-
-</div>
-
-
-
-
-
-<!-- Typing Indicator -->
-
-<div id="typingBox"
-class="hidden px-5 py-2 text-xs text-slate-400 italic">
-
-Someone is typing...
+class="flex-1 overflow-y-auto p-5 space-y-3">
 
 </div>
 
@@ -308,47 +270,16 @@ Someone is typing...
 
 
 
-<!-- Message Composer -->
-
-<div
-class="bg-slate-900 border-t border-slate-800 p-4">
+<div class="p-4 bg-slate-900 border-t border-slate-800 flex gap-3">
 
 
-<div class="flex gap-3 items-center">
+<input id="messageInput"
+class="flex-1 bg-slate-950 border border-slate-700 rounded-lg p-3"
+placeholder="Message campus...">
 
 
-
-<input
-id="messageInput"
-class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-indigo-500"
-placeholder="Write something to campus...">
-
-
-
-
-
-<input
-id="mediaInput"
-type="file"
-accept="image/*,video/*"
-class="hidden">
-
-
-
-<button
-id="uploadBtn"
-class="bg-slate-800 hover:bg-slate-700 px-4 py-3 rounded-xl">
-
-📎
-
-</button>
-
-
-
-
-<button
-id="sendBtn"
-class="bg-indigo-600 hover:bg-indigo-500 px-6 py-3 rounded-xl font-bold">
+<button id="sendBtn"
+class="bg-indigo-600 px-6 rounded-lg">
 
 Send
 
@@ -359,206 +290,41 @@ Send
 
 
 
-</div>
-
-
-</section>
-
-
-
 </main>
+    <script>
 
+let socket = null;
 
-</div>
+let currentUser = null;
 
+let selectedFile = null;
 
 
 
+const $ = id => document.getElementById(id);
 
 
-<!-- =========================
-     WHISPER MODAL
-========================= -->
 
 
-<div
-id="whisperModal"
-class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-5">
+const authView = $("authView");
+const appView = $("appView");
 
+const authError = $("authError");
 
-<div
-class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md p-6">
+const messages = $("messages");
 
+const usersList = $("usersList");
 
-<h2 class="text-xl font-bold text-purple-400 mb-4">
-Anonymous Whisper 🤫
-</h2>
+const messageInput = $("messageInput");
 
-
-
-<textarea
-id="whisperInput"
-rows="4"
-class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 outline-none resize-none"
-placeholder="Say something anonymously..."></textarea>
-
-
-
-
-<div class="flex justify-end gap-3 mt-4">
-
-
-<button
-id="closeWhisper"
-class="px-5 py-2 rounded-lg bg-slate-700">
-
-Cancel
-
-</button>
-
-
-
-<button
-id="sendWhisper"
-class="px-5 py-2 rounded-lg bg-purple-600 hover:bg-purple-500">
-
-Post
-
-</button>
-
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-<!-- =========================
-     MEDIA PREVIEW MODAL
-========================= -->
-
-
-<div
-id="mediaModal"
-class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-5">
-
-
-<div
-class="bg-slate-900 border border-slate-700 rounded-xl p-6 w-full max-w-md">
-
-
-<h3 class="font-bold mb-4">
-Upload Media
-</h3>
-
-
-<div id="uploadStatus"
-class="text-sm text-slate-400 mb-4">
-</div>
-
-
-
-<button
-id="confirmUpload"
-class="w-full bg-indigo-600 hover:bg-indigo-500 py-3 rounded-lg font-bold">
-
-Upload
-
-</button>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-<script>
-
-
-// =========================
-// VARIABLES
-// =========================
-
-
-let socket;
-
-let currentUser=null;
-
-let selectedFile=null;
-
-let reconnectTimer=null;
-
-
-
-
-
-const $ = id =>
-document.getElementById(id);
-
-
-
-
-
-const authView=$("authView");
-
-const appView=$("appView");
-
-const authError=$("authError");
-
-
-const username=$("username");
-
-const password=$("password");
-
-const email=$("email");
-
-
-
-const loginBtn=$("loginBtn");
-
-const signupBtn=$("signupBtn");
-
-const guestBtn=$("guestBtn");
-
-
-
-const messages=$("messages");
-
-const messageInput=$("messageInput");
-
-const sendBtn=$("sendBtn");
-
-const usersList=$("usersList");
-
-
-
-const whisperModal=$("whisperModal");
-
-const whisperInput=$("whisperInput");
-
-
-
-const mediaInput=$("mediaInput");
-
+const sendBtn = $("sendBtn");
 
 
 
 
 
 // =========================
-// WEBSOCKET CONNECT
+// CONNECT WEBSOCKET
 // =========================
 
 
@@ -566,7 +332,7 @@ function connect(){
 
 
 const protocol =
-location.protocol==="https:"
+location.protocol === "https:"
 ? "wss:"
 : "ws:";
 
@@ -578,10 +344,10 @@ new WebSocket(
 
 
 
-socket.onopen=()=>{
+socket.onopen = ()=>{
 
 console.log(
-"CampusPulse connected"
+"CampusPulse Connected"
 );
 
 };
@@ -590,203 +356,22 @@ console.log(
 
 
 
-socket.onclose=()=>{
-
+socket.onclose = ()=>{
 
 console.log(
 "Disconnected"
 );
 
 
-
-reconnectTimer=setTimeout(
+setTimeout(
 connect,
 3000
 );
 
-
 };
 
 
 
-
-
-socket.onerror=()=>{
-
-console.log(
-"socket error"
-);
-
-};
-
-
-
-
-}
-
-
-
-
-
-connect();
-
-
-
-
-
-
-// =========================
-// AUTH UI
-// =========================
-
-
-
-loginBtn.onclick=()=>{
-
-
-send({
-
-type:"login",
-
-name:username.value,
-
-password:password.value
-
-});
-
-
-};
-
-
-
-
-
-signupBtn.onclick=()=>{
-
-
-send({
-
-type:"signup",
-
-name:username.value,
-
-password:password.value,
-
-email:email.value
-
-});
-
-
-};
-
-
-
-
-
-guestBtn.onclick=()=>{
-
-
-send({
-
-type:"login",
-
-name:
-"Guest-"+Math.random()
-.toString(36)
-.substring(2,7)
-
-});
-
-
-};
-
-
-
-
-
-function send(data){
-
-
-if(
-socket &&
-socket.readyState===1
-){
-
-socket.send(
-JSON.stringify(data)
-);
-
-}
-
-
-}
-
-
-
-
-
-
-// =========================
-// FORGOT PASSWORD
-// =========================
-
-
-$("forgotBtn").onclick=()=>{
-
-
-$("forgotBox")
-.classList
-.toggle("hidden");
-
-
-};
-
-
-
-$("resetBtn").onclick=
-async()=>{
-
-
-const res=
-await fetch(
-"/api/forgot-password",
-{
-
-method:"POST",
-
-headers:{
-"Content-Type":
-"application/json"
-},
-
-body:
-JSON.stringify({
-
-email:
-$("forgotEmail").value
-
-})
-
-
-});
-
-
-
-const data=
-await res.json();
-
-
-
-$("resetStatus")
-.innerText=
-data.message ||
-data.error;
-
-
-};
-// =========================
-// WEBSOCKET EVENTS
-// =========================
 
 
 socket.onmessage=(event)=>{
@@ -797,7 +382,8 @@ let data;
 
 try{
 
-data=JSON.parse(event.data);
+data =
+JSON.parse(event.data);
 
 }
 
@@ -816,10 +402,11 @@ return;
 if(data.type==="me"){
 
 
-currentUser=data.me;
+currentUser =
+data.me;
 
 
-$("myName").innerText=
+$("myName").innerText =
 data.me.name;
 
 
@@ -840,13 +427,13 @@ appView.classList.remove(
 
 
 
-
 // ERROR
+
 
 if(data.type==="auth_error"){
 
 
-authError.innerText=
+authError.innerText =
 data.message;
 
 
@@ -879,8 +466,7 @@ data.users
 
 
 
-
-// INITIAL STATE
+// STATE
 
 
 if(data.type==="state"){
@@ -896,14 +482,14 @@ messages.innerHTML="";
 
 
 
-(data.messages||[])
+(data.messages || [])
 .forEach(
 m=>renderMessage(m)
 );
 
 
 
-(data.whispers||[])
+(data.whispers || [])
 .forEach(
 w=>renderWhisper(w)
 );
@@ -917,14 +503,14 @@ data.poll
 );
 
 
+
 }
 
 
 
 
 
-
-// NEW MESSAGE
+// CHAT
 
 
 if(data.type==="chat"){
@@ -959,6 +545,8 @@ data.whisper
 
 
 
+
+
 // POLL
 
 
@@ -973,6 +561,75 @@ data.poll
 }
 
 
+};
+
+
+}
+
+
+
+
+
+connect();
+
+
+
+
+
+
+// =========================
+// SEND DATA
+// =========================
+
+
+function send(data){
+
+
+if(
+socket &&
+socket.readyState === WebSocket.OPEN
+){
+
+socket.send(
+JSON.stringify(data)
+);
+
+}
+
+
+}
+
+
+
+
+
+
+
+// =========================
+// LOGIN
+// =========================
+
+
+
+$("loginBtn").onclick=()=>{
+
+
+authError.classList.add(
+"hidden"
+);
+
+
+
+send({
+
+type:"login",
+
+name:$("loginName").value.trim(),
+
+password:$("loginPassword").value.trim()
+
+});
+
 
 };
 
@@ -985,17 +642,109 @@ data.poll
 
 
 // =========================
-// SEND MESSAGE
+// SIGNUP
 // =========================
 
 
 
-sendBtn.onclick=
+$("signupBtn").onclick=()=>{
+
+
+let name =
+$("loginName").value.trim();
+
+
+let password =
+$("loginPassword").value.trim();
+
+
+let email =
+$("signupEmail").value.trim();
+
+
+
+
+if(!name || !password || !email){
+
+
+authError.innerText =
+"Name password and email required";
+
+
+authError.classList.remove(
+"hidden"
+);
+
+
+return;
+
+}
+
+
+
+
+
+send({
+
+type:"signup",
+
+name,
+
+password,
+
+email
+
+});
+
+
+};
+
+
+
+
+
+
+
+// =========================
+// GUEST
+// =========================
+
+
+
+$("guestBtn").onclick=()=>{
+
+
+send({
+
+type:"login",
+
+name:
+"Guest"
+
+});
+
+
+};
+
+
+
+
+
+
+
+// =========================
+// CHAT SEND
+// =========================
+
+
+
+sendBtn.onclick =
 sendMessage;
 
 
 
-messageInput.onkeydown=e=>{
+messageInput.onkeydown =
+e=>{
 
 
 if(e.key==="Enter")
@@ -1007,16 +756,18 @@ sendMessage();
 
 
 
+
 function sendMessage(){
 
 
-let text=
+let text =
 messageInput.value.trim();
 
 
 if(!text)
 
 return;
+
 
 
 
@@ -1041,8 +792,6 @@ messageInput.value="";
 
 
 
-
-
 // =========================
 // RENDER MESSAGE
 // =========================
@@ -1052,82 +801,97 @@ function renderMessage(msg){
 
 
 
-let div=
+let div =
 document.createElement(
 "div"
 );
 
 
 
-let mine=
+let mine =
 currentUser &&
 msg.from===currentUser.id;
 
 
 
-div.className=
+div.className =
 `
 flex
-${mine?"justify-end":"justify-start"}
+${mine?
+"justify-end":
+"justify-start"}
 `;
 
 
 
-div.innerHTML=`
+
+
+div.innerHTML = `
+
 
 <div class="
-max-w-[75%]
-rounded-2xl
+max-w-[70%]
+rounded-xl
 p-3
+
 ${mine?
 "bg-indigo-600":
 "bg-slate-800 border border-slate-700"}
+
 ">
 
 
-<div class="text-xs opacity-60 mb-1">
+<div class="
+text-xs
+opacity-60
+">
 
 ${escapeHTML(msg.name)}
 •
-${msg.time||""}
+${msg.time || ""}
 
 </div>
 
 
-<div>
+
+<p class="mt-1">
 
 ${escapeHTML(msg.text)}
 
-</div>
+</p>
 
 
-${msg.mediaUrl?
+
+${msg.mediaUrl ?
+
 `
 
 <img
 src="${msg.mediaUrl}"
-class="mt-2 rounded-xl max-h-64">
+class="rounded-lg mt-2 max-h-64">
 
 `
+
 :""}
+
 
 
 </div>
 
+
 `;
+
 
 
 
 messages.appendChild(div);
 
 
-
-messages.scrollTop=
+messages.scrollTop =
 messages.scrollHeight;
 
 
 }
-
 
 
 
@@ -1152,40 +916,35 @@ users.forEach(
 u=>{
 
 
-let li=
+let li =
 document.createElement(
 "li"
 );
 
 
 
-li.className=
+li.className =
 `
 bg-slate-950
 border
 border-slate-800
 rounded-lg
-px-3
-py-2
-text-sm
+p-2
 flex
 justify-between
+text-sm
 `;
 
 
 
-li.innerHTML=
-
-`
+li.innerHTML = `
 
 <span>
 ${escapeHTML(u.name)}
 </span>
 
 
-<span class="
-text-xs
-text-indigo-400">
+<span class="text-indigo-400 text-xs">
 ${u.role}
 </span>
 
@@ -1200,56 +959,83 @@ usersList.appendChild(li);
 
 
 }
-
-
-
-
-
-
-
-
-
-// =========================
+        // =========================
 // WHISPERS
 // =========================
+
+
+$("mobileWhisperBtn").onclick=()=>{
+
+
+let text =
+prompt(
+"Write anonymous whisper"
+);
+
+
+if(text && text.trim()){
+
+
+send({
+
+type:"whisper",
+
+text:text.trim()
+
+});
+
+
+}
+
+
+};
+
+
+
+
 
 
 
 function renderWhisper(w){
 
 
-let div=
+
+let div =
 document.createElement(
 "div"
 );
 
 
 
-div.className=
+div.className =
 `
 bg-purple-950/40
 border
-border-purple-700/40
+border-purple-700
 rounded-xl
 p-4
-text-purple-200
-mx-auto
 max-w-xl
+mx-auto
 `;
 
 
 
-div.innerHTML=
+div.innerHTML = `
 
-`
 
-<b>
-🤫 Anonymous
+<b class="text-purple-300">
+
+🤫 Anonymous Whisper
+
 </b>
 
+
 <p class="mt-2">
+
 ${escapeHTML(w.text)}
+
 </p>
+
 
 `;
 
@@ -1258,8 +1044,11 @@ ${escapeHTML(w.text)}
 messages.appendChild(div);
 
 
-}
+messages.scrollTop =
+messages.scrollHeight;
 
+
+}
 
 
 
@@ -1277,14 +1066,20 @@ messages.appendChild(div);
 function renderPoll(p){
 
 
-$("pollQuestion")
-.innerText=
+$("pollQuestion").innerText =
 p.question;
 
 
+$("pollOptions").innerHTML="";
 
-$("pollOptions")
-.innerHTML="";
+
+
+let total =
+p.votes.reduce(
+(a,b)=>a+b,
+0
+);
+
 
 
 
@@ -1292,14 +1087,25 @@ p.options.forEach(
 (opt,i)=>{
 
 
-let btn=
+let percent =
+total ?
+Math.round(
+p.votes[i]/total*100
+)
+:
+0;
+
+
+
+
+let btn =
 document.createElement(
 "button"
 );
 
 
 
-btn.className=
+btn.className =
 `
 w-full
 text-left
@@ -1312,25 +1118,8 @@ text-xs
 
 
 
-let total=
-p.votes.reduce(
-(a,b)=>a+b,
-0
-);
-
-
-
-let percent=
-total?
-Math.round(
-p.votes[i]/total*100
-)
-:0;
-
-
-
-btn.innerText=
-`${opt} - ${percent}%`;
+btn.innerText =
+`${opt}  ${percent}%`;
 
 
 
@@ -1354,6 +1143,7 @@ $("pollOptions")
 .appendChild(btn);
 
 
+
 });
 
 
@@ -1365,74 +1155,18 @@ $("pollOptions")
 
 
 
-
-
 // =========================
-// WHISPER
+// FORGOT PASSWORD
 // =========================
 
 
-$("mobileWhisperBtn").onclick=
-()=>{
 
-whisperModal
+$("forgotBtn").onclick=()=>{
+
+
+$("forgotBox")
 .classList
-.remove(
-"hidden"
-);
-
-};
-
-
-
-$("closeWhisper").onclick=
-()=>{
-
-
-whisperModal
-.classList
-.add(
-"hidden"
-);
-
-
-};
-
-
-
-
-
-$("sendWhisper").onclick=
-()=>{
-
-
-let text=
-whisperInput.value.trim();
-
-
-
-if(!text)
-
-return;
-
-
-
-send({
-
-type:"whisper",
-
-text
-
-});
-
-
-
-whisperInput.value="";
-
-
-whisperModal
-.classList
-.add(
+.toggle(
 "hidden"
 );
 
@@ -1444,77 +1178,193 @@ whisperModal
 
 
 
-
-
-
-// =========================
-// UPLOAD
-// =========================
-
-
-$("uploadBtn").onclick=
-()=>{
-
-
-mediaInput.click();
-
-
-};
-
-
-
-
-mediaInput.onchange=e=>{
-
-
-selectedFile=
-e.target.files[0];
-
-
-
-if(selectedFile){
-
-
-$("mediaModal")
-.classList
-.remove(
-"hidden"
-);
-
-
-}
-
-
-};
-
-
-
-
-
-$("confirmUpload").onclick=
+$("sendResetBtn").onclick=
 async()=>{
 
 
-if(!selectedFile)
+let email =
+$("forgotEmail")
+.value
+.trim();
+
+
+
+if(!email){
+
+$("forgotStatus")
+.innerText =
+"Enter email";
+
+return;
+
+}
+
+
+
+$("forgotStatus")
+.innerText =
+"Sending...";
+
+
+
+try{
+
+
+let res =
+await fetch(
+"/api/forgot-password",
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":
+"application/json"
+},
+
+body:
+JSON.stringify({
+email
+})
+
+}
+
+);
+
+
+
+let data =
+await res.json();
+
+
+
+$("forgotStatus")
+.innerText =
+res.ok
+?
+"✅ Mail sent"
+:
+data.error;
+
+
+
+}
+
+catch{
+
+
+$("forgotStatus")
+.innerText =
+"Server error";
+
+
+}
+
+
+
+};
+
+
+
+
+
+
+
+
+// =========================
+// MEDIA UPLOAD SUPPORT
+// =========================
+
+
+
+let uploadInput =
+document.createElement(
+"input"
+);
+
+
+uploadInput.type =
+"file";
+
+
+uploadInput.accept =
+"image/*,video/*";
+
+
+uploadInput.className =
+"hidden";
+
+
+document.body.appendChild(
+uploadInput
+);
+
+
+
+
+
+let uploadButton =
+document.createElement(
+"button"
+);
+
+
+
+uploadButton.innerText =
+"📎";
+
+
+uploadButton.className =
+`
+bg-slate-700
+px-4
+rounded-lg
+`;
+
+
+
+$("sendBtn")
+.parentElement
+.insertBefore(
+uploadButton,
+$("sendBtn")
+);
+
+
+
+
+uploadButton.onclick=()=>{
+
+uploadInput.click();
+
+};
+
+
+
+
+
+uploadInput.onchange =
+async()=>{
+
+
+let file =
+uploadInput.files[0];
+
+
+
+if(!file)
 
 return;
 
 
 
-$("uploadStatus")
-.innerText=
-"Uploading...";
-
-
-
-let form=
+let form =
 new FormData();
-
 
 
 form.append(
 "media",
-selectedFile
+file
 );
 
 
@@ -1522,7 +1372,7 @@ selectedFile
 try{
 
 
-let res=
+let res =
 await fetch(
 "/api/upload",
 {
@@ -1531,11 +1381,13 @@ method:"POST",
 
 body:form
 
-});
+}
+
+);
 
 
 
-let data=
+let data =
 await res.json();
 
 
@@ -1546,42 +1398,29 @@ type:"chat",
 
 text:"",
 
-mediaUrl:data.fileUrl,
+mediaUrl:
+data.fileUrl,
 
-mediaType:data.fileType
+mediaType:
+data.fileType
 
 });
 
 
 
-$("uploadStatus")
-.innerText=
-"Uploaded";
-
-
-$("mediaModal")
-.classList
-.add(
-"hidden"
-);
-
-
-
 }
 
-catch{
+catch(e){
 
-
-$("uploadStatus")
-.innerText=
-"Upload failed";
-
+console.log(
+"Upload failed",
+e
+);
 
 }
 
 
 };
-
 
 
 
@@ -1595,17 +1434,7 @@ $("uploadStatus")
 // =========================
 
 
-
-$("logoutBtn").onclick=
-()=>{
-
-
-send({
-
-type:"logout"
-
-});
-
+$("logoutBtn").onclick=()=>{
 
 
 if(socket)
@@ -1626,10 +1455,10 @@ location.reload();
 
 
 
-
 // =========================
 // SECURITY
 // =========================
+
 
 
 function escapeHTML(str){
@@ -1645,23 +1474,38 @@ return str
 .toString()
 .replace(
 /[&<>"']/g,
+
 c=>
+
 ({
 
 "&":"&amp;",
+
 "<":"&lt;",
+
 ">":"&gt;",
+
 '"':"&quot;",
+
 "'":"&#039;"
 
 }[c])
+
 );
 
 
 }
 
 
+
 </script>
 
+
 </body>
+
 </html>
+
+
+
+
+</div>

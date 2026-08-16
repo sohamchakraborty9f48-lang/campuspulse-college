@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CampusPulse — College Network</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#07080d;color:#f8fafc;font-family:Inter,system-ui,sans-serif}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 10% 10%,rgba(124,58,237,.18),transparent 28%),radial-gradient(circle at 90% 90%,rgba(236,72,153,.12),transparent 30%)}
+.glass{background:rgba(15,17,27,.80);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(18px)}
+button,input,textarea{font:inherit;outline:none}button{cursor:pointer}.fade{animation:fade .25s ease}@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+::-webkit-scrollbar{width:7px}::-webkit-scrollbar-thumb{background:#272333;border-radius:10px}
+</style>
+</head>
+<body><div id="app"></div>
+<script>
+const S={name:localStorage.getItem("cp_name")||"",tab:"home",me:null,users:[],messages:[],whispers:[],poll:null,privateWith:null,private:{},blocked:new Set(),ws:null,authMode:"login",authError:"",pendingAuth:null};
+const quiz=[["Free period. What do you choose?",["Sleep 😴","Canteen 🍕","Gaming 🎮","Walk 🚶"]],["Assignment due tonight?",["Start now 🧠","Panic at 11 PM 💀","Ask friend 🤝","Pretend tomorrow exists 😂"]]];
+let score=+localStorage.getItem("cp_xp")||0,q=0,answered=false;
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+function connect(){
+ const proto=location.protocol==="https:"?"wss":"ws"; S.ws=new WebSocket(proto+"://"+location.host);
+ S.ws.onopen=()=>{if(S.pendingAuth){send(S.pendingAuth);S.pendingAuth=null}};
+ S.ws.onmessage=e=>{const d=JSON.parse(e.data);
+  if(d.type==="hello")S.me={id:d.id,name:S.name};
+  if(d.type==="me"){S.me=d.me;S.name=d.me.name;localStorage.setItem("cp_name",S.name);S.tab="home";S.authError=""}
+  if(d.type==="auth_error")S.authError=d.message;
+  if(d.type==="state"){S.users=d.users;S.messages=d.messages;S.whispers=d.whispers;S.poll=d.poll}
+  if(d.type==="users")S.users=d.users;
+  if(d.type==="chat")S.messages.push(d.message);
+  if(d.type==="whisper")S.whispers.unshift(d.whisper);
+  if(d.type==="private"){const m=d.message,k=m.from===S.me?.id?m.to:m.from;S.private[k]??=[];S.private[k].push(m)}
+  if(d.type==="poll")S.poll=d.poll;
+  if(d.type==="blocked")S.blocked.add(d.userId);
+  render();
+ };
+ S.ws.onclose=()=>{S.me=null;setTimeout(connect,2000);render()}
+}
+function send(o){if(S.ws?.readyState===1)S.ws.send(JSON.stringify(o))}
+function authTab(t){S.authMode=t;S.authError="";render()}
+function doAuth(mode){
+ let name=document.getElementById("name").value.trim();
+ let pass=document.getElementById("pass").value;
+ if(!name)return alert("Enter a username");
+ if(!pass||pass.length<4)return alert("Password must be at least 4 characters");
+ S.authError="";
+ S.pendingAuth={type:mode,name:name.slice(0,20),password:pass};
+ if(!S.ws||S.ws.readyState!==1)connect();else send(S.pendingAuth),S.pendingAuth=null;
+}
+function setTab(t){S.tab=t;render()}
+function sendChat(){let i=document.getElementById("chat");if(!i?.value.trim())return;send({type:"chat",text:i.value});i.value=""}
+function sendWhisper(){let i=document.getElementById("whisper");if(!i?.value.trim())return;send({type:"whisper",text:i.value});i.value="";render()}
+function openPrivate(id){if(S.blocked.has(id)||id===S.me?.id)return;S.privateWith=id;S.tab="private";render()}
+function sendPrivate(){let i=document.getElementById("pmsg");if(!i?.value.trim()||!S.privateWith)return;send({type:"private",to:S.privateWith,text:i.value});i.value=""}
+function blockUser(id){send({type:"block",userId:id});S.blocked.add(id);if(S.privateWith===id)S.privateWith=null;render()}
+function unblockUser(id){send({type:"unblock",userId:id});S.blocked.delete(id);render()}
+function reportUser(id){let r=prompt("Reason for report (optional):")??"";send({type:"report",userId:id,reason:r});alert("Report sent.");}
+function vote(i){send({type:"vote",index:i})}
+function game(i){if(answered)return;answered=true;score+=10;localStorage.setItem("cp_xp",score);render()}
+function next(){q=(q+1)%quiz.length;answered=false;render()}
+function nav(){return `<div class="glass p-1 rounded-2xl flex gap-1 mb-7 overflow-auto">${[["home","⌂","Home"],["chat","💬","Chat"],["private","🔒","Private"],["whispers","🔐","Whispers"],["games","🎮","Games"],["poll","🗳️","Poll"]].map(a=>`<button onclick="setTab('${a[0]}')" class="flex-1 min-w-[90px] py-3 rounded-xl text-sm ${S.tab===a[0]?"bg-white/10":"text-slate-500"}">${a[1]} ${a[2]}</button>`).join("")}</div>`}
+function header(){return `<header class="sticky top-0 z-40 bg-[#07080d]/90 backdrop-blur-xl border-b border-white/5"><div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between"><b>Campus<span class="text-violet-400">Pulse</span></b><div class="text-xs flex gap-3 items-center"><span class="text-emerald-400">● ${S.users.length} online</span><span class="text-slate-500">${esc(S.name)}</span></div></div></header>`}
+function home(){return `<section class="fade"><div class="grid lg:grid-cols-[1.3fr_.7fr] gap-5"><div class="glass rounded-[2rem] p-8 md:p-10"><p class="text-violet-400 text-xs uppercase tracking-[.3em]">College network</p><h1 class="text-4xl md:text-6xl font-bold mt-3">Your unofficial campus internet.</h1><p class="text-slate-400 mt-5 leading-7">Everyone connected to this server shares the same live campus space.</p><div class="grid grid-cols-3 gap-3 mt-8"><div class="bg-white/[.03] rounded-2xl p-4"><b>${S.users.length}</b><p class="text-xs text-slate-500">Online</p></div><div class="bg-white/[.03] rounded-2xl p-4"><b>${S.messages.length}</b><p class="text-xs text-slate-500">Messages</p></div><div class="bg-white/[.03] rounded-2xl p-4"><b>${S.whispers.length}</b><p class="text-xs text-slate-500">Whispers</p></div></div></div><div class="glass rounded-[2rem] p-7"><p class="text-xs uppercase tracking-widest text-pink-300">🔐 Latest whisper</p><p class="mt-6 text-lg leading-7">${S.whispers[0]?esc(S.whispers[0].text):"Be the first to drop an anonymous secret."}</p><button onclick="setTab('whispers')" class="mt-7 w-full py-3 rounded-xl bg-white/5 border border-white/10">Open Whispers →</button></div></div><div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-5">${[["💬","Campus Chat","Talk to everyone.","chat"],["🔒","Private Chat","Message one person.","private"],["🔐","Whispers","Post anonymously.","whispers"],["🎮","Games","Earn XP.","games"]].map(x=>`<button onclick="setTab('${x[3]}')" class="glass rounded-3xl p-6 text-left"><span class="text-3xl">${x[0]}</span><h3 class="font-semibold mt-4">${x[1]}</h3><p class="text-sm text-slate-500 mt-2">${x[2]}</p></button>`).join("")}</div></section>`}
+function chat(){return `<section class="fade"><h2 class="text-2xl font-semibold mb-5">Campus Chat</h2><div class="glass rounded-3xl overflow-hidden"><div class="h-[430px] overflow-y-auto p-5 space-y-3">${S.messages.length?S.messages.map(m=>`<div class="${m.from===S.me?.id?"text-right":""}"><button onclick="openPrivate('${esc(m.from)}')" class="text-xs text-violet-300">${esc(m.name)}</button><span class="text-[10px] text-slate-600 ml-2">${esc(m.time)}</span><div><span class="inline-block mt-1 px-4 py-3 rounded-2xl bg-white/[.05] text-sm">${esc(m.text)}</span></div></div>`).join(""):`<div class="h-full grid place-items-center text-slate-600">Start the conversation 👋</div>`}</div><div class="p-4 border-t border-white/5 flex gap-2"><input id="chat" onkeydown="if(event.key==='Enter')sendChat()" class="flex-1 bg-black/20 rounded-xl px-4 py-3" placeholder="Say something..."><button onclick="sendChat()" class="px-5 rounded-xl bg-violet-500">Send</button></div></div></section>`}
+function privatePage(){let target=S.users.find(u=>u.id===S.privateWith),msgs=S.private[S.privateWith]||[];let people=S.users.filter(u=>u.id!==S.me?.id&&!S.blocked.has(u.id));return `<section class="fade"><h2 class="text-2xl font-semibold mb-5">Private Chat</h2><div class="grid lg:grid-cols-[250px_1fr] gap-4"><div class="glass rounded-3xl p-4"><p class="text-xs text-slate-500 mb-3">PEOPLE</p>${people.length?people.map(u=>`<button onclick="openPrivate('${u.id}')" class="w-full text-left p-3 rounded-xl mb-2 ${u.id===S.privateWith?"bg-violet-500/20":"bg-white/[.03]"}">${esc(u.name)}<span class="block text-[10px] text-emerald-400">● online</span></button>`).join(""):"<p class='text-xs text-slate-600 p-3'>Nobody else is online.</p>"}</div><div class="glass rounded-3xl overflow-hidden">${target?`<div class="p-4 border-b border-white/5 flex justify-between"><b>${esc(target.name)}</b><div class="flex gap-2"><button onclick="reportUser('${target.id}')" class="text-xs px-3 py-2 rounded-lg bg-amber-500/10 text-amber-300">Report</button><button onclick="blockUser('${target.id}')" class="text-xs px-3 py-2 rounded-lg bg-red-500/10 text-red-300">Block</button></div></div><div class="h-[360px] overflow-y-auto p-5 space-y-3">${msgs.map(m=>`<div class="${m.from===S.me?.id?"text-right":""}"><div class="text-[10px] text-slate-600">${esc(m.fromName)} · ${esc(m.time)}</div><span class="inline-block px-4 py-3 rounded-2xl bg-white/[.05] text-sm">${esc(m.text)}</span></div>`).join("")}</div><div class="p-4 border-t border-white/5 flex gap-2"><input id="pmsg" onkeydown="if(event.key==='Enter')sendPrivate()" class="flex-1 bg-black/20 rounded-xl px-4 py-3" placeholder="Private message..."><button onclick="sendPrivate()" class="px-5 rounded-xl bg-violet-500">Send</button></div>`:`<div class="min-h-[480px] grid place-items-center text-slate-600">Select someone to start a private chat.</div>`}</div></div></section>`}
+function whispers(){return `<section class="fade"><h2 class="text-2xl font-semibold mb-5">Anonymous Whispers</h2><div class="glass rounded-3xl p-4 mb-5"><textarea id="whisper" maxlength="240" rows="3" class="w-full bg-transparent resize-none p-2" placeholder="Drop a secret. Your name is not published."></textarea><div class="flex justify-end"><button onclick="sendWhisper()" class="px-5 py-3 rounded-xl bg-pink-500/80">Send Anonymously 🔐</button></div></div><div class="grid md:grid-cols-2 gap-4">${S.whispers.map(w=>`<article class="glass rounded-3xl p-6"><div class="text-xs text-slate-500">🔐 ${esc(w.author)}</div><p class="mt-5 text-sm leading-7">${esc(w.text)}</p></article>`).join("")||`<div class="md:col-span-2 text-center py-16 text-slate-600">No whispers yet.</div>`}</div></section>`}
+function games(){let x=quiz[q];return `<section class="fade"><div class="flex justify-between"><h2 class="text-2xl font-semibold">Mini Game</h2><span>⭐ ${score} XP</span></div><div class="glass rounded-[2rem] p-8 mt-5 text-center"><p class="text-xs text-slate-500">QUESTION ${q+1}/${quiz.length}</p><h3 class="text-2xl mt-4 font-semibold">${esc(x[0])}</h3><div class="grid sm:grid-cols-2 gap-3 mt-8">${x[1].map((o,i)=>`<button onclick="game(${i})" class="p-4 rounded-2xl bg-white/[.04] border border-white/10">${esc(o)}</button>`).join("")}</div>${answered?`<p class="text-emerald-300 mt-6">+10 XP 🎉</p><button onclick="next()" class="mt-4 px-5 py-3 rounded-xl bg-white text-black">Next</button>`:""}</div></section>`}
+function poll(){let total=S.poll?.votes.reduce((a,b)=>a+b,0)||0;return `<section class="fade"><h2 class="text-2xl font-semibold">Daily Poll</h2><div class="glass rounded-[2rem] p-7 mt-5"><h3 class="text-xl">${esc(S.poll?.question||"Loading...")}</h3><div class="space-y-3 mt-7">${(S.poll?.options||[]).map((o,i)=>{let p=total?Math.round(S.poll.votes[i]/total*100):0;return `<button onclick="vote(${i})" class="w-full text-left rounded-2xl bg-white/[.03] p-4 relative overflow-hidden"><div class="absolute inset-y-0 left-0 bg-violet-500/10" style="width:${p}%"></div><span class="relative flex justify-between"><span>${esc(o)}</span><span>${p}%</span></span></button>`}).join("")}</div></div></section>`}
+function login(){return `<main class="min-h-screen grid place-items-center p-5"><div class="max-w-xl w-full text-center"><div class="text-6xl">⚡</div><h1 class="text-5xl md:text-7xl font-bold mt-5">Campus<span class="text-violet-400">Pulse</span></h1><p class="text-slate-400 mt-5">The unofficial live social network for your college.</p><div class="glass rounded-3xl p-6 mt-8 text-left"><div class="flex gap-2 mb-5"><button onclick="authTab('login')" class="flex-1 py-2 rounded-xl ${S.authMode!=='signup'?"bg-white/10":"text-slate-500"}">Log In</button><button onclick="authTab('signup')" class="flex-1 py-2 rounded-xl ${S.authMode==='signup'?"bg-white/10":"text-slate-500"}">Sign Up</button></div><label class="text-xs text-slate-500 uppercase tracking-widest">Username</label><input id="name" value="${esc(S.name)}" maxlength="20" class="w-full mt-2 bg-black/30 border border-white/10 rounded-xl px-4 py-3" placeholder="e.g. Soham"><label class="text-xs text-slate-500 uppercase tracking-widest mt-4 block">Password</label><input id="pass" type="password" maxlength="64" class="w-full mt-2 bg-black/30 border border-white/10 rounded-xl px-4 py-3" placeholder="At least 4 characters">${S.authError?`<p class="text-red-400 text-xs mt-3">${esc(S.authError)}</p>`:""}<button onclick="doAuth('${S.authMode==='signup'?'signup':'login'}')" class="w-full mt-4 py-3 rounded-xl bg-violet-500 font-semibold">${S.authMode==='signup'?'CREATE ACCOUNT →':'LOG IN →'}</button><p class="text-xs text-slate-600 mt-4">Your account is saved so you can log back in later. Don't reuse a password from other sites.</p></div></div></main>`}
+function render(){if(!S.ws||S.ws.readyState!==1){document.getElementById("app").innerHTML=login();return}let c={home,chat,private:privatePage,whispers,games,poll}[S.tab]||home;document.getElementById("app").innerHTML=header()+`<main class="max-w-6xl mx-auto px-4 py-7">${nav()}${c()}</main><footer class="text-center text-xs text-slate-700 py-10">CampusPulse · Node.js + WebSockets</footer>`}
+render();
+</script>
+</body></html>

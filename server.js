@@ -877,7 +877,107 @@ ws.on(
 // ======================================================
 // SERVER START
 // ======================================================
+// ======================================================
+// FILE UPLOAD API
+// ======================================================
 
+app.post(
+"/api/upload",
+upload.single("media"),
+(req,res)=>{
+
+    if(!req.file){
+
+        return res.status(400).json({
+            error:"No file uploaded"
+        });
+
+    }
+
+
+    res.json({
+
+        fileUrl:
+        "/uploads/" + req.file.filename,
+
+        fileType:
+        req.file.mimetype
+
+    });
+
+});
+
+
+
+
+// ======================================================
+// FORGOT PASSWORD API
+// ======================================================
+
+app.post(
+"/api/forgot-password",
+(req,res)=>{
+
+    const email =
+    req.body.email;
+
+
+    const user =
+    users.find(
+        u=>u.email===email
+    );
+
+
+    if(!user){
+
+        return res.status(404).json({
+
+            error:"Email not registered"
+
+        });
+
+    }
+
+
+    console.log(
+        "Password recovery requested:",
+        email
+    );
+
+
+    res.json({
+
+        success:true,
+
+        message:"Recovery mail sent"
+
+    });
+
+
+});
+
+
+
+
+// ======================================================
+// STATUS
+// ======================================================
+
+app.get(
+"/api/status",
+(req,res)=>{
+
+    res.json({
+
+        app:"CampusPulse",
+
+        users:users.length,
+
+        online:sessions.size
+
+    });
+
+});
 
 const PORT =
 process.env.PORT || 3000;
